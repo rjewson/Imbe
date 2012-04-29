@@ -16,14 +16,13 @@
             this.callOnStart = (this.params.onStart && typeof this.params.onStart === 'function');
             this.callOnProgress = (this.params.onProgress && typeof this.params.onProgress === 'function');
             this.callOnEnd = (this.params.onEnd && typeof this.params.onEnd === 'function');
+            if (!this.params.ease) 
+                this.params.ease = Imbe.easing.Linear.None;
         }
     };
 
     Imbe.tween = function(params) {
         this.params = params;
-        this.duration = params.duration;
-        if (!params.ease) 
-            params.ease = Imbe.easing.Linear.None;
         $.extend(this,commonVars);
         this.processParams();
     };
@@ -33,6 +32,9 @@
         constructor : Imbe.tween,
         
         init : function() {
+
+            this.duration = this.params.duration;
+
             this.element = $(this.params.selector);
             this.cachedProps = {};
 
@@ -43,7 +45,7 @@
                 this.params.startProps = {};
             }
 
-            this.usePlugins = false;
+            this.hasComplexTypes = false;
             
             for (var prop in this.params.startProps) {
                 //Create cached set for setting the CSS
@@ -79,13 +81,13 @@
             //Tween all the properties
             for (var prop in this.cachedProps) {
 
-                if (this.usePlugins&&Imbe.plugins[prop]) {
+                if (this.hasComplexTypes&&Imbe.tweenableTypes.complexCSS[prop]) {
                 
-                    this.cachedProps[prop] = Imbe.plugins[prop].call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
+                    this.cachedProps[prop] = Imbe.tweenableTypes.complexCSS[prop].call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
 
                 } else {
                 
-                    this.cachedProps[prop] = Imbe.tweenableTypes.numeric( this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
+                    this.cachedProps[prop] = Imbe.tweenableTypes.numeric.call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
                 
                 }
 
@@ -112,7 +114,6 @@
         this.params = params||{};
         this.children = [];
         this.labels = {};
-        
         $.extend(this,commonVars);
         this.processParams();
     };
@@ -211,9 +212,12 @@
             return easing(percentComplete) * delta + start;
         },
 
-        "background-position" : function(start, end, currentTime, totalTime, easing) {
-            return Imbe.propertyTypes.numeric(start, end, currentTime, totalTime, easing);
-        }
+        complexCSS : {
+            "background-position" : function(start, end, currentTime, totalTime, easing) {
+               return Imbe.propertyTypes.numeric(start, end, currentTime, totalTime, easing);
+            }
+        },
+        
     };
 
 
