@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+
+
+		/*Scrollbar stuff*/
+		#scrollBar {
+			position: relative;
+			margin-top: 100px;
+			width : 1000px;
+			height : 20px;
+			border-style:solid;
+			border-color: #000;
+			border-width: 1px;
+		}
+
+		#scrollBar .thumb {
+			position: absolute;
+			top:0px;
+			left:0px;
+			height:30px;
+			width:20px;
+			margin-left: -10px;
+			margin-top: -6px;
+			border-style:solid;
+			border-color: #000;
+			border-width: 1px;
+			background-color: #DDD;
+		}
+
+		#container {
+			width : 1000px;
+			max-width: 1000px;
+			min-width: 1000px;
+			border-style:solid;
+			border-color: #000;
+			border-width: 1px;
+		}
+
+		#container > div {
+			height : 20px;
+		}
+
+		#tween1 {
+			background-color: #FF0000;
+			width:0px;
+			/*margin-left: 0px;*/
+		}
+
+		#tween2 {
+			background-color: #00FF00;
+			width:0px;
+			/*margin-left: 100px;*/
+		}
+
+		#tween3 {
+			background-color: #0000FF;
+			width:0px;
+			/*margin-left: 200px;*/
+		}
+
+		#tween21 {
+			background-color: #FFFF00;
+			width:0px;
+			/*margin-left: 0px;*/
+		}
+
+		#tween22 {
+			background-color: #00FFFF;
+			width:0px;
+			/*margin-left: 100px;*/
+		}
+
+
+	</style>
+</head>
+<body>
+
+	<div id="container">
+		<div id="tween1"></div>
+		<div id="tween2"></div>
+		<div id="tween3"></div>
+		<div id="tween21"></div>
+		<div id="tween22"></div>
+	</div>
+
+	<div id="scrollBar">
+		<div class="track">
+			<div class="thumb"></div>
+		</div>
+	</div>
+
+</body>
+
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/scrollBar.js"></script>
+<script type="text/javascript" src="../src/Imbe.js"></script>
+
+<script type="text/javascript">
+
+var timeline1 = [
+	{
+		duration:10,
+		selector:'#tween1',
+		startProps:{
+			'width':0,
+			'margin-left':0
+		},
+		endProps:{
+			'width':100
+		}
+	},
+	{
+		duration:10,
+		selector:'#tween2',
+		startProps:{
+			'width':0,
+			'margin-left':100
+		},
+		endProps:{
+			'width':100
+		},
+		onStart:function(){
+			console.log('start');
+		},
+		onEnd:function(){
+			console.log('end');
+		},
+		onProgress:function(){
+			console.log(this.progress);
+		}
+	},
+	{
+		duration:10,
+		selector:'#tween3',
+		startProps:{
+			'width':0,
+			'margin-left':200
+		},
+		endProps:{
+			'width':100
+		}
+	}
+];
+
+var timeline2 = [
+	{
+		duration:10,
+		selector:'#tween21',
+		startProps:{
+			'width':0,
+			'margin-left':300
+		},
+		endProps:{
+			'width':100
+		}
+	},
+	{
+		duration:10,
+		selector:'#tween22',
+		startProps:{
+			'width':0,
+			'margin-left':400
+		},
+		endProps:{
+			'width':100
+		}
+	}
+]
+
+</script>
+
+<script type="text/javascript">
+
+
+
+
+	var tl1 = new Imbe.timeline();
+
+	for ( var i = 0; i <timeline1.length; i++ ) {
+		tl1.insert(new Imbe.tween(timeline1[i]));
+	}
+
+	var tl2 = new Imbe.timeline();
+
+	for ( i = 0; i <timeline2.length; i++ ) {
+		tl2.insert(new Imbe.tween(timeline2[i]));
+	}
+
+	tl1.insert(tl2);
+
+	tl1.init();
+
+console.log('pause');
+
+	// setInterval( update, 100 );
+	// var playhead = 0;
+	// function update() {
+	// 	tl.render(playhead++);
+	// 	//console.log("PH="+playhead);
+	// }
+
+	 window.onScrollUpdate = function(scrollPercent){
+	 	//console.log(scrollPercent);
+	 	tl1.render(scrollPercent*300);
+	 }
+
+</script>
+
+</html>
