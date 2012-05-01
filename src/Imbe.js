@@ -18,6 +18,7 @@
             this.callOnEnd = (this.params.onEnd && typeof this.params.onEnd === 'function');
             if (!this.params.ease) 
                 this.params.ease = Imbe.easing.Linear.None;
+            this.delay = this.params.delay||0;
         }
     };
 
@@ -35,15 +36,16 @@
 
             this.duration = this.params.duration;
 
-            this.element = $(this.params.selector);
+            if (this.params.selector)
+                this.element = $(this.params.selector);
             this.cachedProps = {};
 
             //If were chaining, setup up the flag and reset the startProps to an object
-            this.chainProps = false;
-            if (typeof this.params.startProps === 'string' && this.params.startProps === 'chain') {
-                this.chainProps = true;
-                this.params.startProps = {};
-            }
+            // this.chainProps = false;
+            // if (typeof this.params.startProps === 'string' && this.params.startProps === 'chain') {
+            //     this.chainProps = true;
+            //     this.params.startProps = {};
+            // }
 
             this.hasComplexTypes = false;
             
@@ -93,7 +95,8 @@
 
             }
             //Apply the CSS
-            this.element.css(this.cachedProps);
+            if (this.element)
+                this.element.css(this.cachedProps);
             
             if (this.callOnProgress) 
                 this.params.onProgress.call(this);
@@ -123,20 +126,20 @@
         constructor : Imbe.timeline,
         
         init : function() {
-            var nextStartTime = this.startTime;
+            var nextStartTime = this.startTime + this.delay;
             var count = this.children.length;
 
             for ( var i = 0; i <count; i++ ) {
                 var tweenable = this.children[i];
                 tweenable.init();
                 if (tweenable.timelineOffset<0) {
-                    tweenable.startTime = nextStartTime;
+                    tweenable.startTime = nextStartTime + tweenable.delay;
                 } else {
-                    tweenable.startTime = tweenable.timelineOffset;
+                    tweenable.startTime = this.startTime + this.delay + tweenable.timelineOffset + tweenable.delay;
                 }
                 tweenable.init();
                 if (tweenable.timelineOffset<0) {
-                    nextStartTime += tweenable.duration; 
+                    nextStartTime += tweenable.duration + tweenable.delay; 
                     if (nextStartTime>tweenable.duration+this.startTime)
                         this.duration = nextStartTime-this.startTime;
                 } else {
@@ -147,7 +150,8 @@
         },
 
         insert : function(tween,time) {
-            tween.timelineOffset = time||-1;
+            //tween.timelineOffset = time||-1;
+            tween.timelineOffset = (time === undefined) ? -1 : time;
             this.children.push(tween);
         },
         

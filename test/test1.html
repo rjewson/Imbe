@@ -73,7 +73,6 @@
 			/*margin-left: 100px;*/
 		}
 
-
 	</style>
 </head>
 <body>
@@ -90,6 +89,10 @@
 		<div class="track">
 			<div class="thumb"></div>
 		</div>
+	</div>
+
+
+ 	<div id="testBackground">
 	</div>
 
 </body>
@@ -148,6 +151,7 @@ var timeline1 = [
 var timeline2 = [
 	{
 		duration:10,
+		delay:10,
 		selector:'#tween21',
 		startProps:{
 			'width':0,
@@ -174,38 +178,58 @@ var timeline2 = [
 
 <script type="text/javascript">
 
-
-
-
+	//New timeline
 	var tl1 = new Imbe.timeline();
-
+	//Add the first timeline tweens from JSON
+	//Note, these are all sequenced after each other
 	for ( var i = 0; i <timeline1.length; i++ ) {
 		tl1.insert(new Imbe.tween(timeline1[i]));
 	}
 
+	//Second timeline
 	var tl2 = new Imbe.timeline();
-
+	//Add the second timeline tweens from JSON
+	//Note, these are all sequenced after each other
 	for ( i = 0; i <timeline2.length; i++ ) {
 		tl2.insert(new Imbe.tween(timeline2[i]));
 	}
 
-	tl1.insert(tl2);
+	//Insert a new non CSS (no selector passed...)
+	//This tween is not sequenced after the others because a start time of 0 is passed (will start at begining of timeline, with no delay)
+	tl2.insert(
+		new Imbe.tween({
+			duration:20,
+			startProps:{
+				'x':0,
+				'y':0
+			},
+			endProps:{
+				'x':100,
+				'y':-100
+			},
+			onStart:function(){
+				console.log('start not sequenced');
+			},
+			onEnd:function(){
+				console.log('end not sequenced');
+			},
+			onProgress:function(){
+				console.log((this.progress*100)+"%"+" "+this.cachedProps.x+":"+this.cachedProps.y);
+			}
+		})
+		,0
+	)
 
+	//Insert 2nd time (sequenced) into first
+	tl1.insert(tl2);
+	//Init everything
 	tl1.init();
 
-console.log('pause');
-
-	// setInterval( update, 100 );
-	// var playhead = 0;
-	// function update() {
-	// 	tl.render(playhead++);
-	// 	//console.log("PH="+playhead);
-	// }
-
-	 window.onScrollUpdate = function(scrollPercent){
-	 	//console.log(scrollPercent);
-	 	tl1.render(scrollPercent*300);
-	 }
+	//Update timeline based on drag position of handle
+	window.onScrollUpdate = function(scrollPercent){
+		//console.log(scrollPercent);
+		tl1.render(scrollPercent*300);
+	}
 
 </script>
 
