@@ -38,7 +38,7 @@
 
             if (this.params.selector)
                 this.element = $(this.params.selector);
-            this.cachedProps = {};
+            this.tweenedProps = {};
 
             //If were chaining, setup up the flag and reset the startProps to an object
             // this.chainProps = false;
@@ -51,7 +51,7 @@
             
             for (var prop in this.params.startProps) {
                 //Create cached set for setting the CSS
-                this.cachedProps[prop] = this.params.startProps[prop];
+                this.tweenedProps[prop] = this.params.startProps[prop];
                 //Copy missing props to the end if missing
                 if ( this.params.endProps[prop] == undefined) {
                     this.params.endProps[prop] = this.params.startProps[prop];
@@ -81,22 +81,22 @@
             }
             
             //Tween all the properties
-            for (var prop in this.cachedProps) {
+            for (var prop in this.tweenedProps) {
 
                 if (this.hasComplexTypes&&Imbe.tweenableTypes.complexCSS[prop]) {
                 
-                    this.cachedProps[prop] = Imbe.tweenableTypes.complexCSS[prop].call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
+                    this.tweenedProps[prop] = Imbe.tweenableTypes.complexCSS[prop].call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
 
                 } else {
                 
-                    this.cachedProps[prop] = Imbe.tweenableTypes.numeric.call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
+                    this.tweenedProps[prop] = Imbe.tweenableTypes.numeric.call(this,this.params.startProps[prop], this.params.endProps[prop], this.progress, 1, this.params.ease );
                 
                 }
 
             }
             //Apply the CSS
             if (this.element)
-                this.element.css(this.cachedProps);
+                this.element.css(this.tweenedProps);
             
             if (this.callOnProgress) 
                 this.params.onProgress.call(this);

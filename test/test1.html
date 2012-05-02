@@ -43,8 +43,14 @@
 			height : 20px;
 		}
 
+		#timeline1 {
+			background-color: #000;
+			width:0px;		
+		}
+
 		#tween1 {
 			background-color: #FF0000;
+			height : 10px;
 			width:0px;
 			/*margin-left: 0px;*/
 		}
@@ -59,6 +65,13 @@
 			background-color: #0000FF;
 			width:0px;
 			/*margin-left: 200px;*/
+		}
+
+		#timeline2 {
+			background-color: #000;
+			height : 10px;
+			margin-left: 300px;
+			width:0px;		
 		}
 
 		#tween21 {
@@ -78,21 +91,23 @@
 <body>
 
 	<div id="container">
+		<div id="timeline1"></div>
 		<div id="tween1"></div>
 		<div id="tween2"></div>
 		<div id="tween3"></div>
+		<div id="timeline2"></div>
 		<div id="tween21"></div>
 		<div id="tween22"></div>
+	</div>
+
+	<div id="noncss">
+		<div id="noncss1"></div>
 	</div>
 
 	<div id="scrollBar">
 		<div class="track">
 			<div class="thumb"></div>
 		</div>
-	</div>
-
-
- 	<div id="testBackground">
 	</div>
 
 </body>
@@ -105,7 +120,7 @@
 
 var timeline1 = [
 	{
-		duration:10,
+		duration:100,
 		selector:'#tween1',
 		startProps:{
 			'width':0,
@@ -116,7 +131,7 @@ var timeline1 = [
 		}
 	},
 	{
-		duration:10,
+		duration:100,
 		selector:'#tween2',
 		startProps:{
 			'width':0,
@@ -136,7 +151,7 @@ var timeline1 = [
 		}
 	},
 	{
-		duration:10,
+		duration:100,
 		selector:'#tween3',
 		startProps:{
 			'width':0,
@@ -150,26 +165,26 @@ var timeline1 = [
 
 var timeline2 = [
 	{
-		duration:10,
-		delay:10,
+		duration:50,
+		delay:50,
 		selector:'#tween21',
 		startProps:{
 			'width':0,
-			'margin-left':300
+			'margin-left':350
 		},
 		endProps:{
-			'width':100
+			'width':50
 		}
 	},
 	{
-		duration:10,
+		duration:50,
 		selector:'#tween22',
 		startProps:{
 			'width':0,
 			'margin-left':400
 		},
 		endProps:{
-			'width':100
+			'width':50
 		}
 	}
 ]
@@ -179,7 +194,11 @@ var timeline2 = [
 <script type="text/javascript">
 
 	//New timeline
-	var tl1 = new Imbe.timeline();
+	var tl1 = new Imbe.timeline({
+		onProgress:function(){
+			$('#timeline1').css('width',this.progress*this.duration);
+		}
+	});
 	//Add the first timeline tweens from JSON
 	//Note, these are all sequenced after each other
 	for ( var i = 0; i <timeline1.length; i++ ) {
@@ -187,7 +206,11 @@ var timeline2 = [
 	}
 
 	//Second timeline
-	var tl2 = new Imbe.timeline();
+	var tl2 = new Imbe.timeline({
+		onProgress:function(){
+			$('#timeline2').css('width',this.progress*this.duration);
+		}
+	});
 	//Add the second timeline tweens from JSON
 	//Note, these are all sequenced after each other
 	for ( i = 0; i <timeline2.length; i++ ) {
@@ -198,7 +221,7 @@ var timeline2 = [
 	//This tween is not sequenced after the others because a start time of 0 is passed (will start at begining of timeline, with no delay)
 	tl2.insert(
 		new Imbe.tween({
-			duration:20,
+			duration:70,
 			startProps:{
 				'x':0,
 				'y':0
@@ -214,7 +237,7 @@ var timeline2 = [
 				console.log('end not sequenced');
 			},
 			onProgress:function(){
-				console.log((this.progress*100)+"%"+" "+this.cachedProps.x+":"+this.cachedProps.y);
+				$('#noncss1').html((this.progress*100)+"%"+" "+this.tweenedProps.x+":"+this.tweenedProps.y);
 			}
 		})
 		,0
@@ -228,7 +251,7 @@ var timeline2 = [
 	//Update timeline based on drag position of handle
 	window.onScrollUpdate = function(scrollPercent){
 		//console.log(scrollPercent);
-		tl1.render(scrollPercent*300);
+		tl1.render(scrollPercent*tl1.duration);
 	}
 
 </script>
