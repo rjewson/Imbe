@@ -131,13 +131,15 @@
 
             for ( var i = 0; i <count; i++ ) {
                 var tweenable = this.children[i];
-                tweenable.init();
+                
                 if (tweenable.timelineOffset<0) {
                     tweenable.startTime = nextStartTime + tweenable.delay;
                 } else {
                     tweenable.startTime = this.startTime + this.delay + tweenable.timelineOffset + tweenable.delay;
                 }
+
                 tweenable.init();
+                
                 if (tweenable.timelineOffset<0) {
                     nextStartTime += tweenable.duration + tweenable.delay; 
                     if (nextStartTime>tweenable.duration+this.startTime)
@@ -224,6 +226,27 @@
         
     };
 
+    Imbe.commonTimeline = null;
+    Imbe.interval = null;
+    Imbe.timingResolution = 1000/30;
+
+    Imbe.run = function(tween) {
+        Imbe.commonTimeline.insert(tween,Date.now());
+    };
+
+    Imbe.update = function() {
+        Imbe.commonTimeline.render(Date.now());
+    };
+
+    Imbe.start = function() {
+        if (Imbe.commonTimeline===null)
+            Imbe.commonTimeline = new Imbe.timeline({indefinite:true});
+        Imbe.interval = setInterval(Imbe.update,Imbe.timingResolution);
+    }
+
+    Imbe.stop = function() {
+        clearInterval(Imbe.interval);
+    };
 
     // Robert Penners easing via Tween.js
     Imbe.easing = {
