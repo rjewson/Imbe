@@ -86,6 +86,24 @@
 			/*margin-left: 100px;*/
 		}
 
+		#container2 {
+			width : 1000px;
+			max-width: 1000px;
+			min-width: 1000px;
+			border-style:solid;
+			border-color: #000;
+			border-width: 1px;
+		}
+
+		#container2 > div {
+			height : 20px;
+		}
+
+		#commonTLtween1 {
+			background-color: #FF00FF;
+			width:0px;			
+		}
+
 	</style>
 </head>
 <body>
@@ -101,7 +119,11 @@
 	</div>
 
 	<div id="noncss">
-		<div id="noncss1"></div>
+		<div id="noncss1">-</div>
+	</div>
+
+	<div id="container2">
+		<div id="commonTLtween1"></div>
 	</div>
 
 	<div id="scrollBar">
@@ -253,6 +275,22 @@ var timeline2 = [
 		//console.log(scrollPercent);
 		tl1.render(scrollPercent*tl1.duration);
 	}
+
+	Imbe.commonTimeline.start();
+
+	Imbe.commonTimeline.run(
+		new Imbe.tween({
+			duration:5000,
+			selector:'#commonTLtween1',
+			startProps:{
+				'width':0,
+				'margin-left':0
+			},
+			endProps:{
+				'width':300
+			}
+		})
+	);
 
 </script>
 

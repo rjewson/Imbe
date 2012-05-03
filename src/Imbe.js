@@ -226,27 +226,66 @@
         
     };
 
-    Imbe.commonTimeline = null;
-    Imbe.interval = null;
-    Imbe.timingResolution = 1000/30;
-
-    Imbe.run = function(tween) {
-        Imbe.commonTimeline.insert(tween,Date.now());
-    };
-
-    Imbe.update = function() {
-        Imbe.commonTimeline.render(Date.now());
-    };
-
-    Imbe.start = function() {
-        if (Imbe.commonTimeline===null)
-            Imbe.commonTimeline = new Imbe.timeline({indefinite:true});
-        Imbe.interval = setInterval(Imbe.update,Imbe.timingResolution);
+    var _commonTimeline = function() {
+        this.children = [];
+        this.interval = null;
+        this.timingResolution = 1000/30;
     }
 
-    Imbe.stop = function() {
-        clearInterval(Imbe.interval);
-    };
+    _commonTimeline.prototype = {
+
+        constructor : Imbe.commonTimeline,
+
+        run : function(tween) {
+            this.children.push(tween);
+            tween.startTime = Date.now() + tween.delay;
+            tween.init();
+        },
+
+        update : function() {
+            this.render(Date.now());
+        },
+
+        start : function() {
+            if (!this.interval) {
+                var context = this;
+                var method = this.update;
+                this.interval = setInterval(function(){
+                    method.call(context);
+                },this.timingResolution);
+                
+            }
+        },
+
+        stop : function() {
+            clearInterval(this.interval);
+            this.interval = null;
+        },
+
+        render : function(playHead) {
+            
+            var count = this.children.length;
+            //console.log(playHead);
+            for ( var i = 0; i <count; i++ ) {
+
+                var tweenable = this.children[i];
+
+                if (playHead>=tweenable.startTime && playHead<=tweenable.startTime+tweenable.duration) {    //Tween in range
+                    tweenable.render(playHead);
+                    console.log('1');
+                } else if (playHead>tweenable.startTime+tweenable.duration) {        //Tween out of range but not complete
+                    tweenable.render(playHead);
+                    this.children.splice(i,1);
+                    count--;
+                    console.log('2');
+                }
+
+            }
+        }
+
+    }
+
+    Imbe.commonTimeline = new _commonTimeline();
 
     // Robert Penners easing via Tween.js
     Imbe.easing = {
